@@ -1,4 +1,3 @@
-
 import pandas as pd
 import itertools
 import math
@@ -6,6 +5,8 @@ import random
 import copy
 
 # marginal
+
+
 def count(df, values, recurrences):
     dfValues = df.values
     dfColumns = df.columns
@@ -473,13 +474,13 @@ def AIC_k(df, g):
     return accum
 
 
-def AIC(df, g,alpha):
-    return entropia(df, g, alpha)+AIC_k(df, g,alpha)
+def AIC(df, g, alpha):
+    return entropia(df, g, alpha)+AIC_k(df, g, alpha)
 
 
-def MDL(df, g,alpha):
+def MDL(df, g, alpha):
     N = len(df.index)
-    return entropia(df, g, alpha) + (AIC_k(None,None, alpha))/2*math.log(N, 2)
+    return entropia(df, g, alpha) + (AIC_k(None, None, alpha))/2*math.log(N, 2)
 
 
 def k2(df, g):
@@ -501,3 +502,24 @@ def k2(df, g):
             accum2 *= (num/denom)*accum3
         accum1 *= accum2
     return accum1
+
+
+def hillClimbing(df, initialState):  # initialState tiene la misma forma que g
+    state = initialState
+    auxState = state
+    currScore = k2(df, state)
+    auxScore = currScore
+
+    while(1):
+        neighbors = addEdge(state)+rmvEdge(state)+invEdge(state)
+        for n in neighbors:
+            auxScore = k2(df, n)
+            print("curr", currScore)
+            print("aux", auxScore)
+            if auxScore > currScore:
+                auxState = copy.deepcopy(n)
+                currScore = auxScore
+        if state == auxState:
+            return state
+        else:
+            state = copy.deepcopy(auxState)
